@@ -84,6 +84,7 @@ pub(super) struct UIViewHostObject {
     /// The view controller that controls this view. This is a weak reference
     view_controller: id,
     tag: NSInteger,
+    content_mode: NSInteger,
     clears_context_before_drawing: bool,
     user_interaction_enabled: bool,
     multiple_touch_enabled: bool,
@@ -99,6 +100,7 @@ impl Default for UIViewHostObject {
             superview: nil,
             view_controller: nil,
             tag: 0,
+            content_mode: 0,
             clears_context_before_drawing: true,
             user_interaction_enabled: true,
             multiple_touch_enabled: false,
@@ -752,8 +754,22 @@ pub const CLASSES: ClassExports = objc_classes! {
     msg![env; layer setAffineTransform:transform]
 }
 
+- (NSInteger)contentMode { // should be UIViewContentMode
+    env.objc
+        .borrow::<UIViewHostObject>(this)
+        .content_mode
+}
+
 - (())setContentMode:(NSInteger)content_mode { // should be UIViewContentMode
-    todo_objc_setter!(this, content_mode);
+    log_dbg!(
+        "[(UIView*){:?} setContentMode:{:?}]",
+        this,
+        content_mode
+    );
+
+    env.objc
+        .borrow_mut::<UIViewHostObject>(this)
+        .content_mode = content_mode;
 }
 
 - (bool)clearsContextBeforeDrawing {
