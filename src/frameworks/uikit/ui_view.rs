@@ -619,6 +619,7 @@ pub const CLASSES: ClassExports = objc_classes! {
 
 - (())dealloc {
     let UIViewHostObject {
+        let UIViewHostObject {
         layer,
         superview,
         subviews,
@@ -628,8 +629,8 @@ pub const CLASSES: ClassExports = objc_classes! {
         user_interaction_enabled: _,
         multiple_touch_enabled: _,
         content_mode: _,
-        } = std::mem::take(env.objc.borrow_mut(this));
-    
+    } = std::mem::take(env.objc.borrow_mut(this));
+
     release(env, layer);
     assert!(view_controller == nil);
     assert!(superview == nil);
