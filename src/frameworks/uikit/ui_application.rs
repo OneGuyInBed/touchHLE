@@ -27,6 +27,7 @@ pub struct State {
 struct UIApplicationHostObject {
     delegate: id,
     delegate_is_retained: bool,
+    network_activity_indicator_visible: bool,
 }
 impl HostObject for UIApplicationHostObject {}
 
@@ -56,9 +57,10 @@ pub const CLASSES: ClassExports = objc_classes! {
 // This should only be called by UIApplicationMain
 + (id)allocWithZone:(NSZonePtr)_zone {
     let host_object = Box::new(UIApplicationHostObject {
-        delegate: nil,
-        delegate_is_retained: false,
-    });
+    delegate: nil,
+    delegate_is_retained: false,
+    network_activity_indicator_visible: false,
+});
     env.objc.alloc_static_object(this, host_object, &mut env.mem)
 }
 
@@ -91,6 +93,18 @@ pub const CLASSES: ClassExports = objc_classes! {
             release(env, old_delegate);
         }
     }
+}
+
+- (bool)isNetworkActivityIndicatorVisible {
+    env.objc
+        .borrow::<UIApplicationHostObject>(this)
+        .network_activity_indicator_visible
+}
+
+- (())setNetworkActivityIndicatorVisible:(bool)visible {
+    env.objc
+        .borrow_mut::<UIApplicationHostObject>(this)
+        .network_activity_indicator_visible = visible;
 }
 
 - (bool)isStatusBarHidden {
