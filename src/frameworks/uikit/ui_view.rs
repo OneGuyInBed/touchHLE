@@ -627,8 +627,9 @@ pub const CLASSES: ClassExports = objc_classes! {
         clears_context_before_drawing: _,
         user_interaction_enabled: _,
         multiple_touch_enabled: _,
-    } = std::mem::take(env.objc.borrow_mut(this));
-
+        content_mode: _,
+        } = std::mem::take(env.objc.borrow_mut(this));
+    
     release(env, layer);
     assert!(view_controller == nil);
     assert!(superview == nil);
