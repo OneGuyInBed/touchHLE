@@ -395,15 +395,36 @@ pub const CLASSES: ClassExports = objc_classes! {
 
 - (id)attributesOfItemAtPath:(id)path // NSString *
                        error:(MutPtr<id>)error { // NSError **
-    assert!(error.is_null()); // TODO
+    if !error.is_null() {
+        env.mem.write(error, nil);
+    }
 
-    // TODO: other attributes
-    log_once!("Warning: NSFileManager attributesOfItemAtPath:error: returns only NSFileType, NSFileModificationDate and NSFileSize attributes!");
-
-    let path = ns_string::to_rust_string(env, path); // TODO: avoid copy
-    // TODO: traverse link
-    log_dbg!("[(NSFileManager *){:?} attributesOfItemAtPath:{} error:{:?}]", this, path, error);
+    let path = ns_string::to_rust_string(env, path);
     let guest_path = GuestPath::new(&path);
+
+    log_dbg!(
+        "[(NSFileManager *){:?} attributesOfItemAtPath:{} error:{:?}]",
+        this,
+        path,
+        error
+    );
+
+    if !env.fs.exists(guest_path) {
+        if !error.is_null() {
+            let domain = get_static_str(env, NSCocoaErrorDomain);
+            let ns_error = msg_class![env; NSError alloc];
+            let ns_error = msg![
+                env;
+                ns_error initWithDomain:domain
+                                  code:NSFileReadNoSuchFileError
+                              userInfo:nil
+            ];
+            autorelease(env, ns_error);
+            env.mem.write(error, ns_error);
+        }
+
+        return nil;
+    }
 
     file_attributes_common(env, guest_path)
 }
