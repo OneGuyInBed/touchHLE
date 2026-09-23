@@ -619,17 +619,16 @@ pub const CLASSES: ClassExports = objc_classes! {
 
 - (())dealloc {
     let UIViewHostObject {
-        let UIViewHostObject {
-        layer,
-        superview,
-        subviews,
-        view_controller,
-        tag: _,
-        clears_context_before_drawing: _,
-        user_interaction_enabled: _,
-        multiple_touch_enabled: _,
-        content_mode: _,
-    } = std::mem::take(env.objc.borrow_mut(this));
+    layer,
+    superview,
+    subviews,
+    view_controller,
+    tag: _,
+    content_mode: _,
+    clears_context_before_drawing: _,
+    user_interaction_enabled: _,
+    multiple_touch_enabled: _,
+} = std::mem::take(env.objc.borrow_mut(this));
 
     release(env, layer);
     assert!(view_controller == nil);
